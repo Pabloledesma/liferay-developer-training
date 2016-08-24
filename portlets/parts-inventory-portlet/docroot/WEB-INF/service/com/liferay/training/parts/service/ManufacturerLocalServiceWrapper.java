@@ -77,12 +77,14 @@ public class ManufacturerLocalServiceWrapper implements ManufacturerLocalService
 	*
 	* @param manufacturer the manufacturer
 	* @return the manufacturer that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.training.parts.model.Manufacturer deleteManufacturer(
 		com.liferay.training.parts.model.Manufacturer manufacturer)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _manufacturerLocalService.deleteManufacturer(manufacturer);
 	}
 
@@ -285,6 +287,20 @@ public class ManufacturerLocalServiceWrapper implements ManufacturerLocalService
 		throws java.lang.Throwable {
 		return _manufacturerLocalService.invokeMethod(name, parameterTypes,
 			arguments);
+	}
+
+	/**
+	* Adds the Manufacturer to the database incrementing the primary key
+	*
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.training.parts.model.Manufacturer addManufacturer(
+		com.liferay.training.parts.model.Manufacturer newManufacturer,
+		long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _manufacturerLocalService.addManufacturer(newManufacturer, userId);
 	}
 
 	/**

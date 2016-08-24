@@ -107,11 +107,12 @@ public abstract class PartLocalServiceBaseImpl extends BaseLocalServiceImpl
 	 *
 	 * @param part the part
 	 * @return the part that was removed
+	 * @throws PortalException
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
-	public Part deletePart(Part part) throws SystemException {
+	public Part deletePart(Part part) throws PortalException, SystemException {
 		return partPersistence.remove(part);
 	}
 

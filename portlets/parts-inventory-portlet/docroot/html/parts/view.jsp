@@ -1,16 +1,62 @@
-<%@include file="/html/init.jsp" %>
+
+<%--
+/**
+* Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+*
+* This library is free software; you can redistribute it and/or modify it under
+* the terms of the GNU Lesser General Public License as published by the Free
+* Software Foundation; either version 2.1 of the License, or (at your option)
+* any later version.
+*
+* This library is distributed in the hope that it will be useful, but WITHOUT
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+* FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+* details.
+*/
+--%>
+
+<%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet"%>
+
+<portlet:defineObjects />
+
+<%@include file="/html/init.jsp"%>
 
 <%
 String redirect = PortalUtil.getCurrentURL(renderRequest);
+
+	
+	boolean hasAddPermission = InventoryPermission.contains(
+			permissionChecker, scopeGroupId, "ADD_PART");
+	boolean hasConfigurePermission = InventoryPermission.contains(
+			permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+		
 %>
 
-<aui:button-row>
-	<portlet:renderURL var="addPartURL">
-		<portlet:param name="mvcPath" value="/html/parts/edit_part.jsp" />
-		<portlet:param name="redirect" value="<%= redirect %>" />
-	</portlet:renderURL>
+<liferay-ui:success key="part-added" message="part-added-successfully" />
+<liferay-ui:success key="part-deleted"
+	message="part-deleted-successfully" />
+<liferay-ui:success key="part-updated"
+	message="part-updated-successfully" />
 
-	<aui:button value="add-part" onClick="<%=addPartURL %>"/>
+<aui:button-row>
+	<c:if test='<%= hasAddPermission %>'>
+		<portlet:renderURL var="addPartURL">
+			<portlet:param name="mvcPath" value="/html/parts/edit_part.jsp" />
+			<portlet:param name="redirect" value="<%= redirect %>" />
+		</portlet:renderURL>
+
+		<aui:button name="addPartButton" value="add-part"
+			onClick="<%=addPartURL %>" />
+	</c:if>
+	<c:if test='<%= hasConfigurePermission %>'>
+		<liferay-security:permissionsURL
+			modelResource="com.liferay.training.parts.model"
+			modelResourceDescription="Parts Inventory Top Level Actions"
+			resourcePrimKey="<%= String.valueOf(scopeGroupId) %>"
+			var="permissionsURL" />
+
+		<aui:button value="permissions" onClick="<%= permissionsURL %>" />
+	</c:if>
 </aui:button-row>
 
 <liferay-ui:search-container
@@ -24,7 +70,7 @@ String redirect = PortalUtil.getCurrentURL(renderRequest);
 		modelVar="part" escapedModel="<%= true %>">
 		<liferay-ui:search-container-column-text name="name"
 			value="<%= part.getName(locale) %>" />
-		
+
 		<liferay-ui:search-container-column-text name="part-number"
 			property="partNumber" />
 
@@ -32,7 +78,7 @@ String redirect = PortalUtil.getCurrentURL(renderRequest);
 			property="quantity" />
 
 		<liferay-ui:search-container-column-text name="order-date"
-			 value="<%= new SimpleDateFormat(\"MMMM dd, yyyy\").format(part.getOrderDate()) %>" />
+			value="<%= new SimpleDateFormat(\"MMMM dd, yyyy\").format(part.getOrderDate()) %>" />
 
 		<%
 			String manufacturerName = "";
@@ -57,3 +103,4 @@ String redirect = PortalUtil.getCurrentURL(renderRequest);
 
 	<liferay-ui:search-iterator />
 </liferay-ui:search-container>
+

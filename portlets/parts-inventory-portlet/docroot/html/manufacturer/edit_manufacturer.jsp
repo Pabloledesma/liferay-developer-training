@@ -23,7 +23,6 @@
 
 <aui:form action="<%= editManufacturerURL %>" method="POST" name="fm">
 	<aui:fieldset>
-		
 		<aui:input type="hidden" name="redirect" value="<%= redirect %>" />
 
 		<aui:input type="hidden" name="manufacturerId" value='<%= manufacturer == null ? "" : manufacturer.getManufacturerId() %>'/>

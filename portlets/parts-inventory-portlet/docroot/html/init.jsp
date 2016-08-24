@@ -33,6 +33,10 @@
 <%@ page import="com.liferay.training.parts.service.PartLocalServiceUtil"%>
 <%@ page import="com.liferay.training.parts.service.ManufacturerLocalServiceUtil"%>
 
+<%@ page import="com.liferay.training.parts.service.permission.InventoryPermission"%>
+<%@ page import="com.liferay.training.parts.service.permission.ManufacturerPermission"%>
+<%@ page import="com.liferay.training.parts.service.permission.PartPermission"%>
+
 <liferay-theme:defineObjects />
 
 <portlet:defineObjects />

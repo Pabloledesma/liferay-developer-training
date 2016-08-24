@@ -74,12 +74,14 @@ public class PartLocalServiceWrapper implements PartLocalService,
 	*
 	* @param part the part
 	* @return the part that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
 	@Override
 	public com.liferay.training.parts.model.Part deletePart(
 		com.liferay.training.parts.model.Part part)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return _partLocalService.deletePart(part);
 	}
 
@@ -278,6 +280,19 @@ public class PartLocalServiceWrapper implements PartLocalService,
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable {
 		return _partLocalService.invokeMethod(name, parameterTypes, arguments);
+	}
+
+	/**
+	* Adds the Part to the database incrementing the primary key
+	*
+	* @throws PortalException
+	*/
+	@Override
+	public com.liferay.training.parts.model.Part addPart(
+		com.liferay.training.parts.model.Part newPart, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _partLocalService.addPart(newPart, userId);
 	}
 
 	/**

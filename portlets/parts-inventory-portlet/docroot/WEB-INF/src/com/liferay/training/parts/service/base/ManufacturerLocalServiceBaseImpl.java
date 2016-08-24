@@ -110,12 +110,13 @@ public abstract class ManufacturerLocalServiceBaseImpl
 	 *
 	 * @param manufacturer the manufacturer
 	 * @return the manufacturer that was removed
+	 * @throws PortalException
 	 * @throws SystemException if a system exception occurred
 	 */
 	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public Manufacturer deleteManufacturer(Manufacturer manufacturer)
-		throws SystemException {
+		throws PortalException, SystemException {
 		return manufacturerPersistence.remove(manufacturer);
 	}
 

@@ -1,19 +1,41 @@
 <%@include file="/html/init.jsp" %>
+		<%
+				boolean hasAddPermission = InventoryPermission.contains(
+						permissionChecker, scopeGroupId, "ADD_MANUFACTURER");
+				boolean hasConfigurePermission = InventoryPermission.contains(
+						permissionChecker, scopeGroupId, ActionKeys.PERMISSIONS);
+	    %>
+
 <liferay-ui:success key="manufacturer-added" message="manufacturer-added-successfully" />
 <liferay-ui:success key="manufacturer-updated" message="manufacturer-updated-successfully" />
 <liferay-ui:success key="manufacturer-deleted" message="manufacturer-deleted-successfully" />
+
 <%
 	String redirect = PortalUtil.getCurrentURL(renderRequest);	
 %>
 
 
 <aui:button-row>
-	<portlet:renderURL var="addManufacturerURL">
-		<portlet:param name="mvcPath" value="/html/manufacturer/edit_manufacturer.jsp" />
-		<portlet:param name="redirect" value="<%= redirect %>" />
-	</portlet:renderURL>
+	<c:if test='<%= hasAddPermission %>'>
+		<portlet:renderURL var="addManufacturerURL">
+			<portlet:param name="mvcPath" value="/html/manufacturer/edit_manufacturer.jsp" />
+			<portlet:param name="redirect" value="<%= redirect %>" />
+		</portlet:renderURL>
 
-	<aui:button value="add-manufacturer" onClick="<%= addManufacturerURL.toString() %>"/>
+		<aui:button value="add-manufacturer" onClick="<%= addManufacturerURL.toString() %>" />
+	</c:if>
+	<c:if test='<%= hasConfigurePermission %>'>
+		<liferay-security:permissionsURL
+			modelResource="com.liferay.training.parts.model"
+			modelResourceDescription="Parts Inventory Top Level Actions"
+			resourcePrimKey="<%= String.valueOf(scopeGroupId) %>"
+			var="permissionsURL" />
+
+		<aui:button value="permissions" onClick="<%= permissionsURL %>" />
+	</c:if>
+
+	    
+	    
 </aui:button-row>
 
 

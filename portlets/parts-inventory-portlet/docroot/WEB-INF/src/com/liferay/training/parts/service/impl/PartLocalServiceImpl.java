@@ -14,10 +14,13 @@
 
 package com.liferay.training.parts.service.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.training.parts.model.Part;
 import com.liferay.training.parts.service.base.PartLocalServiceBaseImpl;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,13 +47,54 @@ public class PartLocalServiceImpl extends PartLocalServiceBaseImpl {
 	 * Adds the Part to the database incrementing the primary key
 	 *
 	 */
-	public Part addPart(Part part) throws SystemException {
+		/**
+	 * Adds the Part to the database incrementing the primary key
+	 * @throws PortalException
+	 * 
+	 */
+	public Part addPart(Part newPart, long userId) throws SystemException,
+			PortalException {
 
 		long partId = counterLocalService.increment(Part.class.getName());
+        Date now = new Date();
 
-		part.setPartId(partId);
+		Part part = partPersistence.create(partId);
+		part.setCompanyId(newPart.getCompanyId());
+		part.setGroupId(newPart.getGroupId());
+		part.setUserId(newPart.getUserId());
+		part.setName(newPart.getName());
+		part.setPartNumber(newPart.getPartNumber());
+		part.setOrderDate(newPart.getOrderDate());
+		part.setQuantity(newPart.getQuantity());
+		part.setManufacturerId(newPart.getManufacturerId());
+        part.setCreateDate(now);
+		part.setModifiedDate(now);
 
-		return super.addPart(part);
+		partPersistence.update(part);
+
+		resourceLocalService.addResources(part.getCompanyId(),
+				part.getGroupId(), userId, Part.class.getName(), partId, false,
+				true, true);
+
+		return part;
+
+	}
+
+	public Part deletePart(Part part) throws PortalException, SystemException {
+
+		resourceLocalService.deleteResource(part.getCompanyId(),
+				Part.class.getName(), ResourceConstants.SCOPE_INDIVIDUAL,
+				part.getPrimaryKey());
+
+		return super.deletePart(part);
+
+	}
+
+	public Part deletePart(long partId) throws PortalException, SystemException {
+
+		Part part = partLocalService.getPart(partId);
+
+		return deletePart(part);
 	}
 
 	/**
@@ -59,7 +103,7 @@ public class PartLocalServiceImpl extends PartLocalServiceBaseImpl {
 	 */
 	public List<Part> getPartsByGroupId(long groupId) throws SystemException {
 
-		return partPersistence.findByGroupId(groupId);
+		return partPersistence.filterFindByGroupId(groupId);
 	}
 
 	/**
@@ -68,7 +112,7 @@ public class PartLocalServiceImpl extends PartLocalServiceBaseImpl {
 	 */
 	public List<Part> getPartsByGroupId(long groupId, int start, int end) throws SystemException {
 
-		return partPersistence.findByGroupId(groupId, start, end);
+		return partPersistence.filterFindByGroupId(groupId, start, end);
 	}
 
 	/**
@@ -77,7 +121,7 @@ public class PartLocalServiceImpl extends PartLocalServiceBaseImpl {
 	 */
 	public int getPartsCountByGroupId(long groupId) throws SystemException {
 
-		return partPersistence.countByGroupId(groupId);
+		return partPersistence.filterCountByGroupId(groupId);
 	}
 
 	/**

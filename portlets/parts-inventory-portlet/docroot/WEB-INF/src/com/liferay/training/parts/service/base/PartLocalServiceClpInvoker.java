@@ -117,24 +117,34 @@ public class PartLocalServiceClpInvoker {
 		_methodName42 = "addPart";
 
 		_methodParameterTypes42 = new String[] {
+				"com.liferay.training.parts.model.Part", "long"
+			};
+
+		_methodName43 = "deletePart";
+
+		_methodParameterTypes43 = new String[] {
 				"com.liferay.training.parts.model.Part"
 			};
 
-		_methodName43 = "getPartsByGroupId";
+		_methodName44 = "deletePart";
 
-		_methodParameterTypes43 = new String[] { "long" };
+		_methodParameterTypes44 = new String[] { "long" };
 
-		_methodName44 = "getPartsByGroupId";
-
-		_methodParameterTypes44 = new String[] { "long", "int", "int" };
-
-		_methodName45 = "getPartsCountByGroupId";
+		_methodName45 = "getPartsByGroupId";
 
 		_methodParameterTypes45 = new String[] { "long" };
 
-		_methodName46 = "getPartsByManufacturer";
+		_methodName46 = "getPartsByGroupId";
 
-		_methodParameterTypes46 = new String[] { "long", "long" };
+		_methodParameterTypes46 = new String[] { "long", "int", "int" };
+
+		_methodName47 = "getPartsCountByGroupId";
+
+		_methodParameterTypes47 = new String[] { "long" };
+
+		_methodName48 = "getPartsByManufacturer";
+
+		_methodParameterTypes48 = new String[] { "long", "long" };
 	}
 
 	public Object invokeMethod(String name, String[] parameterTypes,
@@ -240,28 +250,39 @@ public class PartLocalServiceClpInvoker {
 
 		if (_methodName42.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes42, parameterTypes)) {
-			return PartLocalServiceUtil.addPart((com.liferay.training.parts.model.Part)arguments[0]);
+			return PartLocalServiceUtil.addPart((com.liferay.training.parts.model.Part)arguments[0],
+				((Long)arguments[1]).longValue());
 		}
 
 		if (_methodName43.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes43, parameterTypes)) {
-			return PartLocalServiceUtil.getPartsByGroupId(((Long)arguments[0]).longValue());
+			return PartLocalServiceUtil.deletePart((com.liferay.training.parts.model.Part)arguments[0]);
 		}
 
 		if (_methodName44.equals(name) &&
 				Arrays.deepEquals(_methodParameterTypes44, parameterTypes)) {
+			return PartLocalServiceUtil.deletePart(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName45.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes45, parameterTypes)) {
+			return PartLocalServiceUtil.getPartsByGroupId(((Long)arguments[0]).longValue());
+		}
+
+		if (_methodName46.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes46, parameterTypes)) {
 			return PartLocalServiceUtil.getPartsByGroupId(((Long)arguments[0]).longValue(),
 				((Integer)arguments[1]).intValue(),
 				((Integer)arguments[2]).intValue());
 		}
 
-		if (_methodName45.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes45, parameterTypes)) {
+		if (_methodName47.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes47, parameterTypes)) {
 			return PartLocalServiceUtil.getPartsCountByGroupId(((Long)arguments[0]).longValue());
 		}
 
-		if (_methodName46.equals(name) &&
-				Arrays.deepEquals(_methodParameterTypes46, parameterTypes)) {
+		if (_methodName48.equals(name) &&
+				Arrays.deepEquals(_methodParameterTypes48, parameterTypes)) {
 			return PartLocalServiceUtil.getPartsByManufacturer(((Long)arguments[0]).longValue(),
 				((Long)arguments[1]).longValue());
 		}
@@ -315,4 +336,8 @@ public class PartLocalServiceClpInvoker {
 	private String[] _methodParameterTypes45;
 	private String _methodName46;
 	private String[] _methodParameterTypes46;
+	private String _methodName47;
+	private String[] _methodParameterTypes47;
+	private String _methodName48;
+	private String[] _methodParameterTypes48;
 }

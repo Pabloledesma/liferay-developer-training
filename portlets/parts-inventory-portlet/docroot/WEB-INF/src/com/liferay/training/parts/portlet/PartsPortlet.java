@@ -28,56 +28,68 @@ import javax.portlet.ActionResponse;
  * Portlet implementation class PartsPortlet
  */
 public class PartsPortlet extends MVCPortlet {
- 	/**
+
+	/**
 	 * Adds a new part to the database.
 	 * 
 	 */
 	public void addPart(ActionRequest request, ActionResponse response)
-		throws Exception {
+			throws Exception {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay) request
-			.getAttribute(WebKeys.THEME_DISPLAY);
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
 
-		Part part = PartLocalServiceUtil.createPart(0);
+		if (themeDisplay.getPermissionChecker().hasPermission(groupId,
+				"com.liferay.training.parts.model", groupId, "ADD_PART")) {
 			
-		part.setPartId(ParamUtil.getLong(request, "partId"));
+			Part part = PartLocalServiceUtil.createPart(0);
 			
-		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
-			request, "name");
-		part.setNameMap(nameMap);
-		
-		part.setPartNumber(ParamUtil.getString(request, "partNumber"));
-		
-		int orderDateMonth = ParamUtil.getInteger(request, "orderDateMonth");
-		int orderDateDay = ParamUtil.getInteger(request, "orderDateDay");
-		int orderDateYear = ParamUtil.getInteger(request, "orderDateYear");
-		Date orderDate = PortalUtil.getDate(orderDateMonth, orderDateDay,
-			orderDateYear);
-		part.setOrderDate(orderDate);
-		
-		part.setQuantity(ParamUtil.getInteger(request, "quantity"));
-		part.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
-		part.setCompanyId(themeDisplay.getCompanyId());
-		part.setGroupId(themeDisplay.getScopeGroupId());
-		part.setUserId(themeDisplay.getUserId());
+			part.setPartId(ParamUtil.getLong(request, "partId"));
+			
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+					request, "name");
+			part.setNameMap(nameMap);
+			
+			part.setPartNumber(ParamUtil.getString(request, "partNumber"));
+			
+			int orderDateMonth = ParamUtil.getInteger(request, "orderDateMonth");
+			int orderDateDay = ParamUtil.getInteger(request, "orderDateDay");
+			int orderDateYear = ParamUtil.getInteger(request, "orderDateYear");
+			Date orderDate = PortalUtil.getDate(orderDateMonth, orderDateDay,
+					orderDateYear);
+			part.setOrderDate(orderDate);
+			
+			part.setQuantity(ParamUtil.getInteger(request, "quantity"));
+			part.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
+			part.setCompanyId(themeDisplay.getCompanyId());
+			part.setGroupId(themeDisplay.getScopeGroupId());
+			part.setUserId(themeDisplay.getUserId());
 
-		List<String> errors = new ArrayList<String>();
+			List<String> errors = new ArrayList<String>();
 
-		if (PartValidator.validatePart(part, errors)) {
-			PartLocalServiceUtil.addPart(part);
+			if (PartValidator.validatePart(part, errors)) {
 
-			SessionMessages.add(request, "part-added");
+				long userId = themeDisplay.getUserId();
 
-			sendRedirect(request, response);
-		}
-		else {
-			for (String error : errors) {
-				SessionErrors.add(request, error);
+				PartLocalServiceUtil.addPart(part, userId);
+
+				SessionMessages.add(request, "part-added");
+
+				sendRedirect(request, response);
+			} else {
+				for (String error : errors) {
+					SessionErrors.add(request, error);
+				}
+
+				PortalUtil.copyRequestParameters(request, response);
+
+				response.setRenderParameter("mvcPath",
+						"/html/parts/edit_part.jsp");
 			}
-
-			PortalUtil.copyRequestParameters(request, response);
-
-			response.setRenderParameter("mvcPath", "/html/parts/edit_part.jsp");
+		} else {
+			SessionErrors.add(request, "permission-error");
+			sendRedirect(request, response);
 		}
 	}
 
@@ -86,74 +98,100 @@ public class PartsPortlet extends MVCPortlet {
 	 * 
 	 */
 	public void deletePart(ActionRequest request, ActionResponse response)
-		throws Exception {
+			throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay) request
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
 
 		long partId = ParamUtil.getLong(request, "partId");
 
-		if (Validator.isNotNull(partId)) {
-			PartLocalServiceUtil.deletePart(partId);
+		if (themeDisplay.getPermissionChecker().hasPermission(groupId,
+				"com.liferay.training.parts.model.Part",
+				partId, "DELETE")) {
 
-			SessionMessages.add(request, "part-deleted");
+			if (Validator.isNotNull(partId)) {
+				PartLocalServiceUtil.deletePart(partId);
 
+				SessionMessages.add(request, "part-deleted");
+
+				sendRedirect(request, response);
+			} else {
+				SessionErrors.add(request, "deletion-error");
+			}
+		} else {
+			SessionErrors.add(request, "permission-error");
 			sendRedirect(request, response);
-		}
-		else {
-			SessionErrors.add(request, "error-deleting");
 		}
 	}
 
 	/**
 	 * Updates the database record of an existing part.
-	 *
+	 * 
 	 */
 	public void updatePart(ActionRequest request, ActionResponse response)
-		throws Exception {
+			throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay) request
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
+		
 		long partId = ParamUtil.getLong(request, "partId");
 		Part part = null;
 		
 		try {
-			part = PartLocalServiceUtil.fetchPart(partId);
+			part = PartLocalServiceUtil
+					.fetchPart(partId);
 		} catch (SystemException se) {
 			_log.error(se);
 			return;
 		}
 
-		Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
-			request, "name");
-		part.setNameMap(nameMap);
-		
-		part.setPartNumber(ParamUtil.getString(request, "partNumber"));
-		
-		int orderDateMonth = ParamUtil.getInteger(request, "orderDateMonth");
-		int orderDateDay = ParamUtil.getInteger(request, "orderDateDay");
-		int orderDateYear = ParamUtil.getInteger(request, "orderDateYear");
-		Date orderDate = PortalUtil.getDate(orderDateMonth, orderDateDay,
-			orderDateYear);
-		part.setOrderDate(orderDate);
-		
-		part.setQuantity(ParamUtil.getInteger(request, "quantity"));
-		part.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
+		if (themeDisplay.getPermissionChecker().hasPermission(groupId,
+				"com.liferay.training.parts.model.Part",
+				part.getPartId(), "UPDATE")) {
+			
+			Map<Locale, String> nameMap = LocalizationUtil.getLocalizationMap(
+					request, "name");
+			part.setNameMap(nameMap);
+			
+			part.setPartNumber(ParamUtil.getString(request, "partNumber"));
+			
+			int orderDateMonth = ParamUtil.getInteger(request, "orderDateMonth");
+			int orderDateDay = ParamUtil.getInteger(request, "orderDateDay");
+			int orderDateYear = ParamUtil.getInteger(request, "orderDateYear");
+			Date orderDate = PortalUtil.getDate(orderDateMonth, orderDateDay,
+					orderDateYear);
+			part.setOrderDate(orderDate);
+			
+			part.setQuantity(ParamUtil.getInteger(request, "quantity"));
+			part.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
 
-		List<String> errors = new ArrayList<String>();
+			List<String> errors = new ArrayList<String>();
 
-		if (PartValidator.validatePart(part, errors)) {
-			PartLocalServiceUtil.updatePart(part);
+			if (PartValidator.validatePart(part, errors)) {
+				
+				PartLocalServiceUtil.updatePart(part);
 
-			SessionMessages.add(request, "part-updated");
+				SessionMessages.add(request, "part-updated");
 
+				sendRedirect(request, response);
+			} else {
+				for (String error : errors) {
+					SessionErrors.add(request, error);
+				}
+
+				PortalUtil.copyRequestParameters(request, response);
+
+				response.setRenderParameter("mvcPath",
+						"/html/parts/edit_part.jsp");
+			}
+		} else {
+			SessionErrors.add(request, "permission-error");
 			sendRedirect(request, response);
 		}
-		else {
-			for (String error : errors) {
-				SessionErrors.add(request, error);
-			}
-
-			PortalUtil.copyRequestParameters(request, response);
-
-			response.setRenderParameter("mvcPath", "/html/parts/edit_part.jsp");			
-		}
 	}
+
 	private static Log _log = LogFactoryUtil.getLog(PartsPortlet.class);
 
 }

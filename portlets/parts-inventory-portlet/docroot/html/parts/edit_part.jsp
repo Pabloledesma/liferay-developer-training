@@ -26,7 +26,7 @@ String redirect = ParamUtil.getString(request, "redirect");
 <aui:form action="<%= editPartURL %>" method="POST" name="fm">
 	<aui:fieldset>
 		
-				<aui:input type="hidden" name="redirect" value="<%= redirect %>" />
+		<aui:input type="hidden" name="redirect" value="<%= redirect %>" />
 
 		<aui:input type="hidden" name="partId" value='<%= part == null ? "" : part.getPartId() %>'/>
 		

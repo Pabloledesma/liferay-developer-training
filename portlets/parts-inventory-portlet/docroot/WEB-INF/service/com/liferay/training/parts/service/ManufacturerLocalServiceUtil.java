@@ -83,11 +83,13 @@ public class ManufacturerLocalServiceUtil {
 	*
 	* @param manufacturer the manufacturer
 	* @return the manufacturer that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.training.parts.model.Manufacturer deleteManufacturer(
 		com.liferay.training.parts.model.Manufacturer manufacturer)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return getService().deleteManufacturer(manufacturer);
 	}
 
@@ -273,6 +275,19 @@ public class ManufacturerLocalServiceUtil {
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable {
 		return getService().invokeMethod(name, parameterTypes, arguments);
+	}
+
+	/**
+	* Adds the Manufacturer to the database incrementing the primary key
+	*
+	* @throws PortalException
+	*/
+	public static com.liferay.training.parts.model.Manufacturer addManufacturer(
+		com.liferay.training.parts.model.Manufacturer newManufacturer,
+		long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().addManufacturer(newManufacturer, userId);
 	}
 
 	/**

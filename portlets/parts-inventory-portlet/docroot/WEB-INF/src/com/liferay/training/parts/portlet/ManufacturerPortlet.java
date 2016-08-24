@@ -24,109 +24,148 @@ import javax.portlet.ActionResponse;
  * Portlet implementation class ManufacturerPortlet
  */
 public class ManufacturerPortlet extends MVCPortlet {
- 	/**
+ 				/**
 	 * Adds a new manufacturer to the database
 	 * 
 	 */
-
 	public void addManufacturer(ActionRequest request, ActionResponse response)
-		throws Exception {
+			throws Exception {
 
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay = (ThemeDisplay) request
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
 
-		Manufacturer manufacturer = ManufacturerLocalServiceUtil.createManufacturer(0);
+		if (themeDisplay.getPermissionChecker()
+				.hasPermission(groupId, "com.liferay.training.parts.model",
+						groupId, "ADD_MANUFACTURER")) {
 
-		manufacturer.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
-		manufacturer.setName(ParamUtil.getString(request, "name"));
-		manufacturer.setEmailAddress(ParamUtil.getString(request, "emailAddress"));
-		manufacturer.setWebsite(ParamUtil.getString(request, "website"));
-		manufacturer.setPhoneNumber(ParamUtil.getString(request, "phoneNumber"));
-		manufacturer.setCompanyId(themeDisplay.getCompanyId());
-		manufacturer.setGroupId(themeDisplay.getScopeGroupId());
-		manufacturer.setUserId(themeDisplay.getUserId());
+			Manufacturer manufacturer = ManufacturerLocalServiceUtil.createManufacturer(0);
 
-		List<String> errors = new ArrayList<String>();
+			manufacturer.setManufacturerId(ParamUtil.getLong(request, "manufacturerId"));
+			manufacturer.setName(ParamUtil.getString(request, "name"));
+			manufacturer.setEmailAddress(ParamUtil.getString(request, "emailAddress"));
+			manufacturer.setWebsite(ParamUtil.getString(request, "website"));
+			manufacturer.setPhoneNumber(ParamUtil.getString(request, "phoneNumber"));
+			manufacturer.setCompanyId(themeDisplay.getCompanyId());
+			manufacturer.setGroupId(themeDisplay.getScopeGroupId());
+			manufacturer.setUserId(themeDisplay.getUserId());
 
-		if (ManufacturerValidator.validateManufacturer(manufacturer, errors)) {
-			ManufacturerLocalServiceUtil.addManufacturer(manufacturer);
+			List<String> errors = new ArrayList<String>();
 
-			SessionMessages.add(request, "manufacturer-added");
+			if (ManufacturerValidator
+					.validateManufacturer(manufacturer, errors)) {
 
-			sendRedirect(request, response);
-		}
-		else {
-			for (String error : errors) {
-				SessionErrors.add(request, error);
+				long userId = themeDisplay.getUserId();
+
+				ManufacturerLocalServiceUtil.addManufacturer(manufacturer,
+						userId);
+
+				SessionMessages.add(request, "manufacturer-added");
+
+				sendRedirect(request, response);
+			} else {
+				for (String error : errors) {
+					SessionErrors.add(request, error);
+				}
+
+				PortalUtil.copyRequestParameters(request, response);
+
+				response.setRenderParameter("mvcPath",
+						"/html/manufacturer/edit_manufacturer.jsp");
 			}
+		} else {
+			SessionErrors.add(request, "permission-error");
+			sendRedirect(request, response);
 
-			PortalUtil.copyRequestParameters(request, response);
-
-			response.setRenderParameter("mvcPath", "/html/manufacturer/edit_manufacturer.jsp");
 		}
+
 	}
 
-		/**
+					/**
 	 * Updates the database record of an existing manufacturer.
-	 *
+	 * 
 	 */
-	public void updateManufacturer(ActionRequest request, ActionResponse response)
-		throws Exception {
+	public void updateManufacturer(ActionRequest request,
+			ActionResponse response) throws Exception {
+
+		ThemeDisplay themeDisplay = (ThemeDisplay) request
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
 
 		long manufacturerId = ParamUtil.getLong(request, "manufacturerId");
 		Manufacturer manufacturer = null;
 		
 		try {
-			manufacturer = ManufacturerLocalServiceUtil.fetchManufacturer(manufacturerId);
+			manufacturer = ManufacturerLocalServiceUtil
+					.fetchManufacturer(manufacturerId);
 		} catch (SystemException se) {
 			_log.error(se);
 			return;
 		}
 
-		manufacturer.setName(ParamUtil.getString(request, "name"));
-		manufacturer.setEmailAddress(ParamUtil.getString(request, "emailAddress"));
-		manufacturer.setWebsite(ParamUtil.getString(request, "website"));
-		manufacturer.setPhoneNumber(ParamUtil.getString(request, "phoneNumber"));
+		if (themeDisplay.getPermissionChecker().hasPermission(groupId,
+				"com.liferay.training.parts.model.Manufacturer",
+				manufacturer.getManufacturerId(), "UPDATE")) {
+			
+			manufacturer.setName(ParamUtil.getString(request, "name"));
+			manufacturer.setEmailAddress(ParamUtil.getString(request, "emailAddress"));
+			manufacturer.setWebsite(ParamUtil.getString(request, "website"));
+			manufacturer.setPhoneNumber(ParamUtil.getString(request, "phoneNumber"));
 
-		List<String> errors = new ArrayList<String>();
+			List<String> errors = new ArrayList<String>();
 
-		if (ManufacturerValidator.validateManufacturer(manufacturer, errors)) {
-			ManufacturerLocalServiceUtil.updateManufacturer(manufacturer);
+			if (ManufacturerValidator
+					.validateManufacturer(manufacturer, errors)) {
+				
+				ManufacturerLocalServiceUtil.updateManufacturer(manufacturer);
 
-			SessionMessages.add(request, "manufacturer-updated");
+				SessionMessages.add(request, "manufacturer-updated");
 
+				sendRedirect(request, response);
+			} else {
+				for (String error : errors) {
+					SessionErrors.add(request, error);
+				}
+
+				PortalUtil.copyRequestParameters(request, response);
+
+				response.setRenderParameter("mvcPath",
+						"/html/manufacturer/edit_manufacturer.jsp");
+			}
+		} else {
+			SessionErrors.add(request, "permission-error");
 			sendRedirect(request, response);
 		}
-		else {
-			for (String error : errors) {
-				SessionErrors.add(request, error);
-			}
-
-			PortalUtil.copyRequestParameters(request, response);
-
-			response.setRenderParameter("mvcPath", "/html/manufacturer/edit_manufacturer.jsp");
-		}
 	}
-	
-		/**
+
+				/**
 	 * Deletes a manufacturer from the database.
 	 * 
 	 */
 	public void deleteManufacturer(ActionRequest request,
 			ActionResponse response) throws Exception {
 
+		ThemeDisplay themeDisplay = (ThemeDisplay) request
+				.getAttribute(WebKeys.THEME_DISPLAY);
+		long groupId = themeDisplay.getScopeGroupId();
+
 		long manufacturerId = ParamUtil.getLong(request, "manufacturerId");
 
-		if (Validator.isNotNull(manufacturerId)) {
+		if (themeDisplay.getPermissionChecker().hasPermission(groupId,
+				"com.liferay.training.parts.model.Manufacturer",
+				manufacturerId, "DELETE")) {
+
+			if (Validator.isNotNull(manufacturerId)) {
 				ManufacturerLocalServiceUtil.deleteManufacturer(manufacturerId);
 
 				SessionMessages.add(request, "manufacturer-deleted");
 
 				sendRedirect(request, response);
+			} else {
+				SessionErrors.add(request, "error-deleting");
 			}
-			
-		else {
-			SessionErrors.add(request, "null-manufacturer-error");
+		} else {
+			SessionErrors.add(request, "permission-error");
 			sendRedirect(request, response);
 		}
 	}

@@ -14,10 +14,13 @@
 
 package com.liferay.training.parts.service.impl;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.training.parts.model.Manufacturer;
 import com.liferay.training.parts.service.base.ManufacturerLocalServiceBaseImpl;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,17 +48,63 @@ public class ManufacturerLocalServiceImpl
 	 */
 	
 	
-	/**
+		/**
 	 * Adds the Manufacturer to the database incrementing the primary key
-	 *
+	 * @throws PortalException
+	 * 
 	 */
-	public Manufacturer addManufacturer(Manufacturer manufacturer) throws SystemException {
+	public Manufacturer addManufacturer(Manufacturer newManufacturer,
+			long userId) throws SystemException, PortalException {
 
-		long manufacturerId = counterLocalService.increment(Manufacturer.class.getName());
+		long manufacturerId = counterLocalService
+				.increment(Manufacturer.class.getName());
 
-		manufacturer.setManufacturerId(manufacturerId);
+        Date now = new Date();
+		Manufacturer manufacturer = manufacturerPersistence
+				.create(manufacturerId);
+		manufacturer.setCompanyId(newManufacturer.getCompanyId());
+		manufacturer.setGroupId(newManufacturer.getGroupId());
+		manufacturer.setUserId(newManufacturer.getUserId());
+		manufacturer.setName(newManufacturer.getName());
+		manufacturer.setEmailAddress(newManufacturer.getEmailAddress());
+		manufacturer.setWebsite(newManufacturer.getWebsite());
+		manufacturer.setPhoneNumber(newManufacturer.getPhoneNumber());
+        manufacturer.setCreateDate(now);
+        manufacturer.setModifiedDate(now);
 
-		return super.addManufacturer(manufacturer);
+		manufacturerPersistence.update(manufacturer);
+
+		resourceLocalService.addResources(manufacturer.getCompanyId(),
+						manufacturer.getGroupId(), userId,
+						Manufacturer.class.getName(), manufacturerId, false,
+						true, true);
+
+		return manufacturer;
+	}
+
+	/**
+	 * Deletes a manufacturer from the database using the Manufacturer object.
+	 */
+	public Manufacturer deleteManufacturer(Manufacturer manufacturer)
+			throws PortalException, SystemException {
+
+		resourceLocalService.deleteResource(manufacturer.getCompanyId(),
+				Manufacturer.class.getName(),
+				ResourceConstants.SCOPE_INDIVIDUAL,
+				manufacturer.getPrimaryKey());
+
+		return super.deleteManufacturer(manufacturer);
+	}
+
+	/**
+	 * Deletes a manufacturer from the database using a manufacturer ID.
+	 */
+	public Manufacturer deleteManufacturer(long manufacturerId) throws PortalException,
+			SystemException {
+
+		Manufacturer manufacturer = getManufacturer(manufacturerId);
+
+		return deleteManufacturer(manufacturer);
 	}
 
 	/**
@@ -64,7 +113,7 @@ public class ManufacturerLocalServiceImpl
 	 */
 	public List<Manufacturer> getManufacturersByGroupId(long groupId) throws SystemException {
 
-		return manufacturerPersistence.findByGroupId(groupId);
+		return manufacturerPersistence.filterFindByGroupId(groupId);
 	}
 
 	/**
@@ -73,7 +122,7 @@ public class ManufacturerLocalServiceImpl
 	 */
 	public List<Manufacturer> getManufacturersByGroupId(long groupId, int start, int end) throws SystemException {
 
-		return manufacturerPersistence.findByGroupId(groupId, start, end);
+		return manufacturerPersistence.filterFindByGroupId(groupId, start, end);
 	}
 
 	/**
@@ -82,6 +131,6 @@ public class ManufacturerLocalServiceImpl
 	 */
 	public int getManufacturersCountByGroupId(long groupId) throws SystemException {
 
-		return manufacturerPersistence.countByGroupId(groupId);
+		return manufacturerPersistence.filterCountByGroupId(groupId);
 	}
 }

@@ -81,11 +81,13 @@ public class PartLocalServiceUtil {
 	*
 	* @param part the part
 	* @return the part that was removed
+	* @throws PortalException
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.training.parts.model.Part deletePart(
 		com.liferay.training.parts.model.Part part)
-		throws com.liferay.portal.kernel.exception.SystemException {
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
 		return getService().deletePart(part);
 	}
 
@@ -269,6 +271,18 @@ public class PartLocalServiceUtil {
 		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
 		throws java.lang.Throwable {
 		return getService().invokeMethod(name, parameterTypes, arguments);
+	}
+
+	/**
+	* Adds the Part to the database incrementing the primary key
+	*
+	* @throws PortalException
+	*/
+	public static com.liferay.training.parts.model.Part addPart(
+		com.liferay.training.parts.model.Part newPart, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().addPart(newPart, userId);
 	}
 
 	/**
